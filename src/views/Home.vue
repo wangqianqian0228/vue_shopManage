@@ -10,7 +10,9 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      b:2
+    };
   },
 
   components: {},
