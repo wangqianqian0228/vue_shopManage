@@ -10,7 +10,9 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      a:1
+    };
   },
 
   components: {},
@@ -22,6 +24,7 @@ export default {
   // 退出功能：清空window.sessionStorage，并将路由路径转换为/login
   methods: {
     loginOut() {
+
       window.sessionStorage.clear();
       this.$router.push("/login");
     },
