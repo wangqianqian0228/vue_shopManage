@@ -1,12 +1,11 @@
 import Vue from 'vue'
+// 导入element-ui各组件
 import { 
     Button, 
     FormItem,
     Form,
     Input,
     Message
-    
-
 } from 'element-ui'
 
 Vue.use(Button)
@@ -21,3 +20,6 @@ Message.install = function (Vue, options) {
   Vue.use(Message )//消息提示
 //  引入组件的时候自动调用Vue.use()方法，Message对象又会自动调用install这个方法
 // 把这个Message对象放在vue的原型的上。
+
+// 或者直接挂载到vue上
+Vue.prototype.$message = Message;
