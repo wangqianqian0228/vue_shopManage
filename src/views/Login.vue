@@ -1,4 +1,4 @@
-<!--  -->
+<!-- 登陆组件 -->
 <template>
   <div class="login-container">
     <div class="main">
@@ -56,8 +56,8 @@ export default {
     return {
       // 表单的数据绑定对象
       loginForm: {
-        username: "",
-        password: "",
+        username: "admin",
+        password: "123456",
       },
       // 表单的验证规则对象
       Loginrules: {
@@ -112,6 +112,13 @@ export default {
             message: mes,
             type: "success",
           });
+          // 1. 将登陆之后产生的token，存放在客户端的sessionStorage里面，
+          //   1.1 因为token是在当前网站打开期间有效，
+          //   1.2 项目中除了登陆接口以外，其余的API接口，必须在登陆之后才能访问。
+          // 2. 通过编程式导航，跳转到后台主页，路由地址是/home
+          // console.log(res.data.token);
+          window.sessionStorage.setItem('token',res.data.token);
+          this.$router.push('/home');
         } else {
           this.$message({
             showClose: true,
