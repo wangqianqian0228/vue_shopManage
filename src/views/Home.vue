@@ -25,7 +25,9 @@
           unique-opened
           :collapse="isCollapse"
           :collapse-transition="false"
+          router
         >
+        <!-- router设置为true，则二级菜单以 相应的index的值作为 path 进行路由跳转 -->
         <!-- collapse:菜单栏是否折叠 -->
         <!-- collapse-transition：折叠动画是否开启 -->
           <el-submenu
@@ -40,12 +42,13 @@
               <span>{{ item.authName }}</span>
             </template>
             <el-menu-item
-              :index="subitem.id + ''"
+              :index="'/home'+'/'+subitem.path + ''"
               v-for="subitem in item.children"
               :key="subitem.id"
               ><i :class="subiconObj[subitem.id]"></i>
               <span>{{ subitem.authName }}</span></el-menu-item
             >
+            <!-- 由于subitem.path没有'/'，所以需要自己手动加上 -->
           </el-submenu>
         </el-menu></el-aside
       >
