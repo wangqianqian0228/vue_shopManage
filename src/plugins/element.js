@@ -23,7 +23,8 @@ import {
     TableColumn,
     Switch,
     Pagination,
-    Dialog
+    Dialog,
+    MessageBox
 
 } from 'element-ui'
 
@@ -60,3 +61,5 @@ Message.install = function (Vue, options) {
 
 // 或者直接挂载到vue上
 Vue.prototype.$message = Message;
+Vue.prototype.$confirm = MessageBox.confirm
+// MessageBox有confirm,prompt方法，可以直接挂载在Vue.prototype上，以后要用MessageBox上的方法，可以直接使用this.$confirm
