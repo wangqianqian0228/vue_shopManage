@@ -14,14 +14,25 @@
         <el-row :gutter="30">
           <el-col :span="14"
             ><div class="grid-content bg-purple">
-              <el-input placeholder="请输入内容" class="input-with-select" v-model='queryInfo.query'>
-                <el-button slot="append" icon="el-icon-search" @click='getUserList'></el-button>
+              <el-input
+                placeholder="请输入内容"
+                class="input-with-select"
+                v-model="queryInfo.query"
+              >
+                <el-button
+                  slot="append"
+                  icon="el-icon-search"
+                  @click="getUserList"
+                ></el-button>
                 <!-- 只要点击了这个搜索按钮，就去执行getUserList这个函数，这个时候input输入框已经与queryInfo.query进行了双向数据绑定 -->
-              </el-input></div
-          ></el-col>
+              </el-input>
+            </div></el-col
+          >
           <el-col :span="10"
-            ><div class="grid-content bg-purple">
-              <el-button type="primary">添加用户</el-button>
+            ><div class="grid-content bg-purpjle">
+              <el-button type="primary" @click="dialogVisible = true"
+                >添加用户</el-button
+              >
             </div></el-col
           >
         </el-row>
@@ -91,6 +102,36 @@
         <!--  // 根据这个pagesize来分页1 2 3 4  -->
       </el-pagination>
     </el-card>
+
+    <!-- 添加用户对话框 -->
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%" center>
+      <span>确定要添加用户吗？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="adduser">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 添加用户信息 -->
+    <el-dialog title="提示" :visible.sync="addVisible" width="30%" center>
+      <span>
+        <el-form
+          :model="addruleForm"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="100px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="ID" prop="id">
+            <el-input v-model="addruleForm.id"></el-input>
+          </el-form-item>
+        </el-form>
+      </span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -110,6 +151,14 @@ export default {
       },
       userLists: [],
       total: 0,
+      dialogVisible: false,
+      addVisible: false,
+      addruleForm:{
+             id:111
+      },
+      rules:{
+
+      }
     };
   },
   created() {
@@ -164,6 +213,10 @@ export default {
         return this.$message.error(res.meta.msg);
       }
       this.$message.success(res.meta.msg);
+    },
+    adduser() {
+      this.dialogVisible = false;
+      this.addVisible = true;
     },
   },
 };
