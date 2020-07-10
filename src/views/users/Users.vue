@@ -12,7 +12,7 @@
     <!-- el-row和el-col可以更好地做页面的分栏效果 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <el-row :gutter="30">
+        <el-row :gutter="28">
           <el-col :span="14"
             ><div class="grid-content bg-purple">
               <el-input
