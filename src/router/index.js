@@ -4,6 +4,8 @@ import Login from '../views/Login.vue'
 import Home from '../views/Home.vue'
 import Welcome from '../views/Welcome.vue'
 import User from '../views/users/Users.vue'
+import Rights from '../views/rights/Rights.vue'
+import Roles from '../views/rights/Roles.vue'
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
    VueRouter.prototype.push = function push(location) {
@@ -27,7 +29,16 @@ const router = new VueRouter({
       }, {
         path: '/home/users',
         component: User
-      }]
+      },
+      {
+        path: '/home/rights',
+        component: Rights
+      },
+      {
+        path: '/home/roles',
+        component: Roles
+      }
+    ]
     }
   ]
 })

@@ -111,7 +111,7 @@ export default {
       }
       this.menuList = res.data;
       // 得到了数据
-      console.log(this.menuList);
+      // console.log(this.menuList);
     },
     // 点击按钮实现菜单的隐藏与显示
     hideList() {
