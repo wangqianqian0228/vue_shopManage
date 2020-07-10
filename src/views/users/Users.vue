@@ -12,7 +12,7 @@
     <!-- el-row和el-col可以更好地做页面的分栏效果 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <el-row :gutter="28">
+        <el-row :gutter="30">
           <el-col :span="14"
             ><div class="grid-content bg-purple">
               <el-input
@@ -80,9 +80,6 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small"
-              >查看</el-button
-            >
             <el-button type="text" size="small" @click="edituser(scope.row.id)"
               >编辑</el-button
             >
