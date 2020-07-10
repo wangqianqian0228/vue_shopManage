@@ -1,12 +1,7 @@
 <!-- 用户列表-->
 <template>
   <div class="user-box">
-    <!-- 面包屑导航栏 -->
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
-    </el-breadcrumb>
+    getRightsLists
 
     <!-- 卡片 -->
     <!-- el-row和el-col可以更好地做页面的分栏效果 -->
@@ -81,8 +76,8 @@
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="edituser(scope.row.id)"
-              >编辑</el-button
-            >
+              >编辑
+              </el-button>
             <el-button
               type="text"
               size="small"
@@ -266,7 +261,7 @@ export default {
       });
       //   console.log(res.data);
       if (res.meta.status !== 200) {
-        this.$message.error(`${res.meta.msg}`);
+        return this.$message.error(`${res.meta.msg}`);
       }
       this.userLists = res.data.users;
       //   console.log(this.userLists);
@@ -288,7 +283,7 @@ export default {
       this.getUserList();
     },
     async changeState(newState) {
-      console.log(newState);
+      // console.log(newState);
       // 这一行的数据的具体信息
       // { "id": 500, "role_name": "超级管理员", "username": "admin", "create_time": 1486720211, "mobile": "12345678", "email": "adsfad@qq.com", "mg_state": true }
 
@@ -313,7 +308,7 @@ export default {
 
     addUser() {
       let obj = { ...this.addForm };
-      console.log(obj);
+      // console.log(obj);
 
       // 对话框关闭了，就会调用@close=resetAdduser,从而清空表单数据
       // 所以在关闭对话框之前，可以把数据先存起来
@@ -329,7 +324,7 @@ export default {
         let obj = { ...this.addForm };
         // 把表单数据存起来
         const { data: res } = await this.$http.post("users", obj);
-        console.log(res);
+        // console.log(res);
         if (res.meta.status !== 201) {
           this.$message.error(res.meta.msg);
         }
@@ -345,14 +340,14 @@ export default {
       // console.log(id);
       // 根据id来调后台数据
       const { data: res } = await this.$http.get(`users/${id}`);
-      console.log(res);
+      // console.log(res);
       // email: "adsfad@qq.com" id: 500 mobile: "12345678" rid: 0 username: "admin"
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg);
       }
       // 把数据存起来
       this.editForm = res.data;
-      console.log(this.editForm);
+      // console.log(this.editForm);
     },
 
     // 监听表单关闭时候的事件，将表单数据恢复成初始数据。
@@ -365,7 +360,7 @@ export default {
       let editobj = { ...this.editForm };
       // console.log(editobj);
       this.$refs.editruleFormRef.validate(async (value) => {
-        console.log(value);
+        // console.log(value);
         if (!value) {
           this.$message.error("保存用户失败");
           return;
