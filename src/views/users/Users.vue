@@ -10,10 +10,7 @@
         <el-row :gutter="30">
           <el-col :span="14"
             ><div class="grid-content bg-purple">
-              <el-input
-                placeholder="请输入用户名"
-                v-model="queryInfo.query"
-              >
+              <el-input placeholder="请输入用户名" v-model="queryInfo.query">
                 <el-button
                   slot="append"
                   icon="el-icon-search"
@@ -37,17 +34,18 @@
       <el-table :data="userLists" style="width: 100%">
         <el-table-column type="index"></el-table-column>
         <!-- 添加索引列 -->
-        <el-table-column prop="id" label="ID" width="120"> </el-table-column>
+        <el-table-column prop="id" label="ID" width="70"> </el-table-column>
 
-        <el-table-column prop="username" label="用户名" width="120">
+        <el-table-column prop="username" label="用户名" width="75">
         </el-table-column>
-        <el-table-column prop="role_name" label="角色" width="120">
+        <el-table-column prop="role_name" label="角色" width="100">
         </el-table-column>
 
-        <el-table-column prop="email" label="邮箱" width="200">
+        <el-table-column prop="email" label="邮箱" width="170">
         </el-table-column>
-        <el-table-column prop="mobile" label="电话"> </el-table-column>
-        <el-table-column label="创建日期">
+        <el-table-column prop="mobile" label="电话" width="170">
+        </el-table-column>
+        <el-table-column label="创建日期" width="100">
           <template slot-scope="scope">
             {{ scope.row.create_time | dateString }}
             <!-- {{scope.row}} -->
@@ -61,7 +59,7 @@
           { "id": 500, "role_name": "超级管理员", "username": "admin", "create_time": 1486720211, "mobile": "12345678", "email": "adsfad@qq.com", "mg_state": true }
           -->
         </el-table-column>
-        <el-table-column label="状态">
+        <el-table-column label="状态" width="70">
           <template slot-scope="scope">
             <!-- {{scope.row.mg_state}} -->
             <!-- change函数什么时候触发？
@@ -75,14 +73,26 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="edituser(scope.row.id)"
-              >编辑
-              </el-button>
             <el-button
-              type="text"
-              size="small"
+              type="primary"
+              size="mini"
+              icon="el-icon-edit"
+              @click="edituser(scope.row.id)"
+              >编辑
+            </el-button>
+            <el-button
+              type="danger"
+              size="mini"
+              icon="el-icon-delete"
               @click="deleteUser(scope.row.id)"
               >删除</el-button
+            >
+            <el-button
+              type="warning"
+              size="mini"
+              icon="el-icon-s-tools"
+              @click="allotUser(scope.row)"
+              >分配角色</el-button
             >
           </template>
         </el-table-column>
@@ -122,7 +132,7 @@
         <el-form-item label="邮箱" label-width="70px" prop="email">
           <el-input v-model="addForm.email" autocomplete="off"></el-input>
         </el-form-item>
-       <!--  <el-form-item label="角色" label-width="70px" prop="role">
+        <!--  <el-form-item label="角色" label-width="70px" prop="role">
           <el-input v-model="addForm.role" autocomplete="off"></el-input>
         </el-form-item> -->
         <el-form-item label="手机号" label-width="70px" prop="mobile">
@@ -167,6 +177,35 @@
         <el-button type="primary" @click="editSafe">保 存</el-button>
       </div>
     </el-dialog>
+
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色" center :visible.sync="allotdialogVisible" @close='resetAllotDialog'>
+      <div>
+        <p class="allot-content">
+          当前用户名：<span>{{ allotInfo.username }}</span>
+        </p>
+        <p class="allot-content">
+          当前角色：<span>{{ allotInfo.role_name }}</span>
+        </p>
+        <p>
+          分配新角色：
+          <el-select v-model="selectedId" placeholder="请选择">
+            <el-option
+              v-for="item in rolesoptions"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+          <!-- 通过selectedId进行双向绑定，选了哪个，就把哪个的id值存在selectedId之中，最后再提交至数据库 :value真正选中的值 -->
+        </p>
+      </div>
+      <div slot="footer">
+        <el-button @click="allotdialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="allotRolesSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -202,9 +241,15 @@ export default {
         pagesize: 5,
         // 根据这个pagesize来分页1 2 3 4
       },
+      allotInfo: {},
       dialogTableVisible: false,
       dialogFormVisible: false,
       editDialogVisible: false,
+      allotdialogVisible: false,
+      // 获取的角色列表
+      rolesoptions: [],
+      // 选中的角色对应的id值
+      selectedId: "",
       userLists: [],
       total: 0,
       dialogVisible: false,
@@ -305,7 +350,7 @@ export default {
     },
     // 添加用户之前先进性预校验
     // 实现表单的预验证
-    
+
     addUser() {
       let obj = { ...this.addForm };
       // console.log(obj);
@@ -407,6 +452,54 @@ export default {
       this.$message.success(result.meta.msg);
       this.getUserList();
     },
+    // 给用户分配角色,显示对话框
+    async allotUser(user) {
+      this.allotdialogVisible = true;
+      this.allotInfo = user;
+      // 获取角色列表
+      const { data: res } = await this.$http.get("roles");
+      // console.log(res);
+      // res:0: {id: 30, roleName: "主管", roleDesc: "技术负责人", children: Array(5)}
+      // 1: {id: 31, roleName: "测试角色", roleDesc: "测试角色描述", children: Array(2)}
+      // 2: {id: 34, roleName: "测试角色2", roleDesc: "测试描述12", children: Array(1)}
+      // 3: {id: 39, roleName: "大发送到", roleDesc: "阿斯蒂芬", children: Array(0)}
+      // 4: {id: 40, roleName: "test", roleDesc: "test", children: Array(2)}
+      // 5: {id: 41, roleName: "dsdf", roleDesc: "sf ", children: Array(0)}
+      // 6: {id: 42, roleName: "技术大佬", roleDesc: "666", children: Array(1)}
+      // 7: {id: 43, roleName: "李张伟", roleDesc: "777", children: Array(2)}
+
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取角色列表失败");
+      }
+      this.rolesoptions = res.data;
+      // console.log(this.rolesoptions);
+    },
+
+    // 提交分配的新角色
+    async allotRolesSubmit() {
+      //  先判断一下用户有没有设置新角色
+      if (!this.selectedId) {
+        return this.$message.error("请输入用户角色");
+      }
+      // 分配用户请求
+      const {
+        data: res,
+      } = await this.$http.put(`users/${this.allotInfo.id}/role`, {
+        rid: this.selectedId,
+      });
+      //  console.log(res);
+      if (res.meta.status !== 200) {
+        return this.$message.error("设置角色失败");
+      }
+      this.$message.success("设置角色成功");
+      this.getUserList();
+      this.allotdialogVisible = false;
+    },
+    resetAllotDialog() {
+      this.selectedId='',
+      this.rolesoptions=''
+    }
+    //有时候默认情况下有数据显示，可能是数据没有清空的原因
   },
 };
 </script>
@@ -414,7 +507,11 @@ export default {
 .el-card {
   margin-top: 15px;
 }
-
+.el-button {
+  width: 70px;
+  height: 25px;
+  padding: 7px 2px;
+}
 .el-table >>> td,
 .el-table >>> th {
   text-align: center;
@@ -434,5 +531,8 @@ export default {
 } */
 .el-card >>> .el-button--small {
   margin-right: -6px;
+}
+.allot-content {
+  margin-bottom: 10px;
 }
 </style>

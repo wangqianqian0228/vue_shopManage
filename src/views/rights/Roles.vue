@@ -75,7 +75,7 @@
                 </el-row>
               </el-col>
             </el-row>
-            <!-- {{scope.row.children}} -->
+            <!-- <pre>{{ scope.row }}</pre> -->
           </template>
         </el-table-column>
         <el-table-column type="index" width="60"> </el-table-column>
@@ -103,7 +103,7 @@
               type="warning"
               icon="el-icon-setting"
               size="mini"
-              @click="setRightsDialogVisible()"
+              @click="setRightsDialogVisible(scope.row)"
               >分配权限</el-button
             >
           </template>
@@ -174,13 +174,21 @@
       :visible.sync="setRightsDialog"
       width="50%"
       center
-      @close="resetRolesForm"
+      @close="resetDefkeys"
     >
-      <el-tree :data="rightsLists" :props="defaultProps" show-checkbox node-key='id' default-expand-all></el-tree>
+      <el-tree
+        :data="rightsLists"
+        :props="defaultProps"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :default-checked-keys="defkeys"
+        ref="allotRightsref"
+      ></el-tree>
 
       <span slot="footer">
         <el-button @click="setRightsDialog = false">取 消</el-button>
-        <el-button type="primary" @click="safeRoles">保 存</el-button>
+        <el-button type="primary" @click="allotRights">保 存</el-button>
       </span>
     </el-dialog>
     <!-- 分配权限对话框结束 -->
@@ -193,6 +201,9 @@ export default {
     return {
       rolesLists: [],
       rightsLists: [],
+      roleId: "",
+      // 存储默认选中的权限的id
+      defkeys: [],
       addRolesDialog: false,
       aditRolesDialog: false,
       setRightsDialog: false,
@@ -215,10 +226,10 @@ export default {
       // 树形控件的属性绑定对象
       defaultProps: {
         // 父子节点通过哪个属性来进行嵌套的
-          children: 'children',
-          // label：看到的是哪个属性的值
-          label: 'authName'
-        }
+        children: "children",
+        // label：看到的是哪个属性的值
+        label: "authName",
+      },
     };
   },
   created() {
@@ -344,7 +355,8 @@ export default {
       roles.children = res.data;
     },
     // 分配权限的对话框的显示
-    async setRightsDialogVisible() {
+    async setRightsDialogVisible(role) {
+      this.roleId = role.id;
       const { data: res } = await this.$http.get(`rights/tree`);
       // 树形是一层一层的显示
       // 把数据放在rightsLists上面
@@ -352,7 +364,45 @@ export default {
       // console.log(this.rightsLists);
       // const{data:result}= await this.$http.get(`rights/list`)
       // 列表形是直接显示出所有的数据
+      this.getRightsId(role, this.defkeys);
+      // console.log(this.defkeys);
       this.setRightsDialog = true;
+    },
+
+    // 获取三级权限的id，然后把对应的id追加到数组中，要根据递归的方法
+    getRightsId(node, arr) {
+      // 该项没有孩子的话，就把对应的id追加给数组，则每一个数组元素都要执行该函数，所以需要用到数组的forEach()方法
+      if (!node.children) {
+        return arr.push(node.id);
+      }
+      node.children.forEach((item) => {
+        this.getRightsId(item, arr);
+      });
+      //  孩子们都执行这个函数，所以里面的参数，为item
+    },
+    // 关闭对话框后，将defkeys数组设置成空数组，以防止越积越多。
+    resetDefkeys() {
+      this.defkeys = [];
+    },
+
+    // 给角色分配权限并提交给服务器
+    async allotRights() {
+      const chooseArr = [
+        ...this.$refs.allotRightsref.getCheckedKeys(),
+        ...this.$refs.allotRightsref.getHalfCheckedKeys(),
+      ];
+      const idString = chooseArr.join(",");
+      const { data: res } = await this.$http.post(
+        `roles/${this.roleId}/rights`,
+        { rids: idString }
+      );
+      if(res.meta.status!==200){
+          return this.$message.error(res.meta.msg);
+      }
+      this.$message.success('权限更改成功！');
+      console.log(res);
+      this.getRolesLists();
+      this.setRightsDialog = false;
     },
   },
 };
