@@ -6,6 +6,10 @@ import Welcome from '../views/Welcome.vue'
 import User from '../views/users/Users.vue'
 import Rights from '../views/rights/Rights.vue'
 import Roles from '../views/rights/Roles.vue'
+import Categories from '../views/categories/Categories.vue'
+import Params from '../views/categories/Params.vue'
+import Goods from '../views/categories/Goods.vue'
+
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
    VueRouter.prototype.push = function push(location) {
@@ -37,6 +41,18 @@ const router = new VueRouter({
       {
         path: '/home/roles',
         component: Roles
+      },
+      {
+        path: '/home/goods',
+        component: Goods
+      },
+      {
+        path: '/home/params',
+        component: Params
+      },
+      {
+        path: '/home/categories',
+        component: Categories
       }
     ]
     }
