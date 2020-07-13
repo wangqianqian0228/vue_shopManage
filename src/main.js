@@ -6,6 +6,10 @@ import './assets/css/reset.css'
 import './assets/css/common.css'
 import axios from 'axios'
 import moment from 'moment'
+import TreeTable from 'vue-table-with-tree-grid'
+
+
+
 // 配置请求的根路径
 axios.defaults.baseURL = `http://127.0.0.1:8888/api/private/v1/`
 // 挂载到vue上，vue所有的组件就可以用$http这个方法
@@ -29,7 +33,8 @@ Vue.filter("dateString", function (value, format) {
   return moment.unix(parseInt(value)).format(format || "YYYY-MM-DD");
   // 自己传的参数format有的话，自定义的格式优先，没有的话，就是函数里面的格式优先
 });
-
+// 注册组件
+Vue.component('tree-table', TreeTable)
 new Vue({
   router,
   render: h => h(App)
