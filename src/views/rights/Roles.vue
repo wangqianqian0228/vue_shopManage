@@ -117,8 +117,7 @@
       :visible.sync="addRolesDialog"
       width="30%"
       center
-      @close="resetRolesForm"
-    >
+      @close="resetRolesForm">
       <el-form
         :model="roleInfo"
         :rules="rolerules"
