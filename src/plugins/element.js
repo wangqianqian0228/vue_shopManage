@@ -29,7 +29,9 @@ import {
     Tree,
     Select,
     Option,
-    Loading
+    Loading,
+    Cascader,
+    Alert
 
 } from 'element-ui'
 
@@ -62,6 +64,8 @@ Vue.use(Tree)
 Vue.use(Select)
 Vue.use(Option)
 Vue.use(Loading)
+Vue.use(Cascader)
+Vue.use(Alert)
 
 
 
