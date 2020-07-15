@@ -373,7 +373,7 @@ export default {
         }
       ).catch((err) => err);
       if (result !== "confirm") {
-        return this.$message.info("已取消操作");
+        return this.$message.info("已取消删除");
       }
       const { data: res } = await this.$http.delete(`categories/${id}`);
       console.log(res);
