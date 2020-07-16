@@ -1,4 +1,4 @@
-<!-- 商品分类 -->
+<!-- 商品分类2 -->
 <template>
   <div class="categories-box">
     <!-- 面包屑导航栏 -->
