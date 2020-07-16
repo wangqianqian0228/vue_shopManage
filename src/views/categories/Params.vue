@@ -37,6 +37,33 @@
           <!-- 动态参数表格 -->
           <el-table :data="manyParams" style="width: 100%">
             <el-table-column type="expand" width="50" align="center">
+              <template slot-scope="scope">
+                <el-tag
+                  closable
+                  v-for="(item, index) in scope.row.attr_vals"
+                  :key="item.attr_id"
+                  @close="removeTags(index, scope.row)"
+                  >{{ item }}</el-tag
+                >
+
+                <el-input
+                  class="input-new-tag"
+                  v-if="scope.row.inputVisible"
+                  v-model="scope.row.inputValue"
+                  ref="saveTagInput"
+                  size="small"
+                  @keyup.enter.native="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
+                >
+                </el-input>
+                <el-button
+                  v-else
+                  class="button-new-tag"
+                  size="small"
+                  @click="showInput(scope.row)"
+                  >添加标签</el-button
+                >
+              </template>
             </el-table-column>
             <el-table-column
               type="index"
@@ -78,6 +105,33 @@
           <!-- 静态属性表格 -->
           <el-table :data="onlyParams" style="width: 100%">
             <el-table-column type="expand" width="50" align="center">
+             <template slot-scope="scope">
+                <el-tag
+                  closable
+                  v-for="(item, index) in scope.row.attr_vals"
+                  :key="item.attr_id"
+                  @close="removeTags(index, scope.row)"
+                  >{{ item }}</el-tag
+                >
+
+                <el-input
+                  class="input-new-tag"
+                  v-if="scope.row.inputVisible"
+                  v-model="scope.row.inputValue"
+                  ref="saveTagInput"
+                  size="small"
+                  @keyup.enter.native="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
+                >
+                </el-input>
+                <el-button
+                  v-else
+                  class="button-new-tag"
+                  size="small"
+                  @click="showInput(scope.row)"
+                  >添加标签</el-button
+                >
+              </template>
             </el-table-column>
             <el-table-column
               type="index"
@@ -97,8 +151,11 @@
                   @click="editDialogVisible(scope.row)"
                   >编辑</el-button
                 >
-                <el-button type="danger" icon="el-icon-delete" size="mini"
-                @click="deleteDialogVisible(scope.row.attr_id)"
+                <el-button
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  @click="deleteDialogVisible(scope.row.attr_id)"
                   >删除</el-button
                 >
               </template>
@@ -200,6 +257,8 @@ export default {
       },
       // 属性id
       attributeId: "",
+      inputVisible: false,
+      inputValue: "",
     };
   },
   created() {
@@ -237,7 +296,9 @@ export default {
         params: { type: 3 },
       });
       if (res.meta.status !== 200) {
-        return this.$message.error("父级列表获取失败");
+        this.$message.error("父级列表获取失败");
+
+        return;
       }
       this.paramsLists = res.data;
       //  console.log(this.paramsLists);
@@ -245,8 +306,17 @@ export default {
     // 级联选择框发生改变时触发的事件
     handleParamsChange() {
       // console.log(this.paramsSelectedKeys);
-      // 获取商品对应的参数数据
-      this.getCatesParams();
+
+      if (this.paramsSelectedKeys.length === 3) {
+        // 获取商品对应的参数数据
+        this.getCatesParams();
+      } else {
+        this.$message.warning('低于三级不能进行相关操作')
+        this.paramsSelectedKeys = [];
+        this.manyParams = [];
+        this.onlyParams = [];
+
+      }
     },
     // Tabs栏发生改变触发的事件,也会触发getCatesParams函数
     handleTabsClick() {
@@ -265,6 +335,15 @@ export default {
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg);
       }
+      // 将attr_vals字符串转换为数组
+      // 做一下判断，如果item.attr_vals为空的话就返回一个空数组
+      // 遍历res.data中的每一项
+      res.data.forEach((item) => {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(" ") : [];
+        // 给每一项添加inputVisible和inputValue属性
+        item.inputVisible = false;
+        item.inputValue = "";
+      });
       if (this.activeName == "many") {
         // 存储动态数据
         this.manyParams = res.data;
@@ -276,11 +355,11 @@ export default {
         // console.log(this.onlyParams);
         this.addManyInfo.attr_sel = "only";
       }
+      // console.log(res.data);
     },
     addParamsDialog() {
       this.addDialogVisible = true;
-      this.addManyInfo.attr_name=''
-
+      this.addManyInfo.attr_name = "";
     },
     // 关闭对话框重置表单
     resetParamsDialog() {
@@ -302,7 +381,6 @@ export default {
         this.$message.success("创建分类成功");
         this.getCatesParams();
         this.addDialogVisible = false;
-
       });
     },
     // 打开编辑对话框
@@ -331,7 +409,7 @@ export default {
     },
     // 删除提交,id接收属性id
     async deleteDialogVisible(id) {
-      const result =await this.$confirm("确定要删除这项参数吗？", "提示", {
+      const result = await this.$confirm("确定要删除这项参数吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -350,6 +428,52 @@ export default {
       this.$message.success(res.meta.msg);
       this.getCatesParams();
     },
+
+    // 点击添加标签
+    showInput(row) {
+      row.inputVisible = true;
+      // $nextTick():页面上的元素被重新渲染之后，才会执行回调函数中的代码
+      this.$nextTick((_) => {
+        // 获得input元素并且执行focus()
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    async handleInputConfirm(row) {
+      // 检查input输入框有没有输入内容
+      if (row.inputValue.trim().length === 0) {
+        row.inputVisible = false;
+        row.inputValue = "";
+        return;
+      }
+      row.inputVisible = false;
+      row.attr_vals.push(row.inputValue);
+      row.inputVisible = false;
+      row.inputValue = "";
+      this.submitTags(row);
+    },
+    // 将row.attr_vals数据发给数据库
+    async submitTags(row) {
+      const { data: res } = await this.$http.put(
+        `categories/${this.paramsId}/attributes/${row.attr_id}`,
+        {
+          attr_name: row.attr_name,
+          attr_sel: row.attr_sel,
+          // 要将数组转换成以空格分隔的字符串
+          attr_vals: row.attr_vals.join(" "),
+        }
+      );
+      if (res.meta.status !== 200) {
+        this.$message.error(res.meta.msg);
+        return;
+      }
+    },
+    // 删除Tag标签
+    removeTags(i, row) {
+      // 删除数组元素
+      row.attr_vals.splice(i, 1);
+      // 提交至数据库
+      this.submitTags(row);
+    },
   },
 };
 </script>
@@ -359,5 +483,19 @@ export default {
 }
 .cascader-box span {
   margin-right: 10px;
+}
+.el-tag {
+  margin: 0 15px 15px 0;
+}
+.input-new-tag {
+  width: 100px;
+  margin-left: 10px;
+}
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 </style>
