@@ -9,6 +9,7 @@ import Roles from '../views/rights/Roles.vue'
 import Categories from '../views/categories/Categories.vue'
 import Params from '../views/categories/Params.vue'
 import Goods from '../views/categories/Goods.vue'
+import Addgoods from '../views/categories/Addgoods.vue'
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
@@ -53,7 +54,12 @@ const router = new VueRouter({
       {
         path: '/home/categories',
         component: Categories
+      },
+      {
+        path: '/home/addgoods',
+        component: Addgoods
       }
+
     ]
     }
   ]

@@ -1,7 +1,11 @@
 <!-- 用户列表-->
 <template>
   <div class="user-box">
-    getRightsLists
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
+    </el-breadcrumb>
 
     <!-- 卡片 -->
     <!-- el-row和el-col可以更好地做页面的分栏效果 -->
@@ -22,7 +26,7 @@
           >
           <el-col :span="10"
             ><div>
-              <el-button type="primary" @click="dialogFormVisible = true"
+              <el-button type="primary" @click="dialogFormVisible = true" class="el-btn-add"
                 >添加用户</el-button
               >
             </div></el-col
@@ -512,6 +516,10 @@ export default {
   height: 25px;
   padding: 7px 2px;
 }
+.el-button.el-btn-add{
+  width: 80px;
+  height: 40px;
+}
 .el-table >>> td,
 .el-table >>> th {
   text-align: center;
@@ -520,9 +528,7 @@ export default {
   color: black;
   font-weight: bold;
 }
-.el-pagination {
-  margin-top: 20px;
-}
+
 .user-box >>> .el-card__body {
   padding-top: 0;
 }

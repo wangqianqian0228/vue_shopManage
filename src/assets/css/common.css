@@ -1,18 +1,40 @@
-html,body,#app{
-    height: 100%;
+html,
+body,
+#app {
+  height: 100%;
 }
-.el-cascader__dropdown{
-    height:200px;
-    top:272px;
-   }
-   .el-cascader-panel {
-     height: 100%;
-     overflow: hidden;
-   }
-   .el-scrollbar__wrap {
-     overflow: auto !important;
-   }
-   .el-card {
-    margin-top: 15px;
-  }
- 
+
+.el-cascader__dropdown {
+  height: 200px;
+  top: 272px;
+}
+
+.el-cascader-panel {
+  height: 100%;
+  overflow: hidden;
+}
+
+.el-scrollbar__wrap {
+  overflow: auto !important;
+}
+
+.el-card {
+  margin-top: 15px;
+}
+
+.el-pagination {
+  margin-top: 20px;
+}
+
+.text-over-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.el-step__icon {
+  width: 20px;
+    height: 20px;
+}
+.el-step__title{
+  font-size: 14px;
+}
