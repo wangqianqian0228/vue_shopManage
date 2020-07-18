@@ -36,27 +36,34 @@
         <el-tabs
           tab-position="left"
           v-model="activeindex"
+          :before-leave="beforeChangeTabs"
+          @tab-click="tabClicked"
         >
           <el-tab-pane label="基本信息" name="0">
             <el-form-item label="商品名称" prop="goods_name">
               <el-input v-model="addGoodsruleForm.goods_name"></el-input>
             </el-form-item>
-            <el-form-item label="商品价格" prop="goods_price" type='number'>
+            <el-form-item label="商品价格" prop="goods_price" type="number">
               <el-input v-model="addGoodsruleForm.goods_price"></el-input>
             </el-form-item>
-            <el-form-item label="商品重量" prop="goods_weight" type='number'>
+            <el-form-item label="商品重量" prop="goods_weight" type="number">
               <el-input v-model="addGoodsruleForm.goods_weight"></el-input>
             </el-form-item>
-            <el-form-item label="商品数量" prop="goods_number" type='number'>
+            <el-form-item label="商品数量" prop="goods_number" type="number">
               <el-input v-model="addGoodsruleForm.goods_number"></el-input>
             </el-form-item>
             <el-form-item label="商品内容" prop="goods_introduce">
               <el-input v-model="addGoodsruleForm.goods_introduce"></el-input>
             </el-form-item>
-
-            
-           <el-form-item label="商品分类" prop="goods_cat">
-              <el-input v-model="addGoodsruleForm.goods_cat"></el-input>
+            <!-- prop用来做校验规则的 -->
+            <el-form-item label="商品分类" prop="goods_cat">
+              <el-cascader
+                v-model="selectedKeys"
+                :options="parentsLists"
+                :props="cateCascaderProps"
+                @change="handleChange"
+              >
+              </el-cascader>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
@@ -73,18 +80,18 @@
 export default {
   data() {
     return {
-      // 字符串类型
+      // 字符串类型，tabs选中的下标
       activeindex: "0",
       addGoodsruleForm: {
         goods_name: "",
-        goods_cat: "1,2,3",
+        // 商品所属的分类数组
+        goods_cat: "",
         goods_price: 0,
         goods_weight: 0,
-        goods_number:0,
-        goods_introduce:'',
-        pics:{},
-        attrs:[]
-
+        goods_number: 0,
+        goods_introduce: "",
+        pics: {},
+        attrs: [],
       },
       addGoodsRules: {
         goods_name: [
@@ -99,17 +106,92 @@ export default {
         goods_number: [
           { required: true, message: "请输入数量", trigger: "blur" },
         ],
+        goods_cat: [
+          { required: true, message: "请输入商品分类", trigger: "blur" },
+        ],
       },
+      selectedKeys: [],
+      parentsLists: [],
+      cateCascaderProps: {
+        expandTrigger: "hover",
+        //  选定的值
+        value: "cat_id",
+        //  看到的名字
+        label: "cat_name",
+        //  父子节点之间的关系
+        children: "children",
+        //  父子节点取消选中关联，从而达到选择任意一级选项的目的
+        checkStrictl: true,
+      },
+      manyCatesData: [],
     };
   },
-
+  created() {
+    this.getcateLists();
+  },
   components: {},
 
-  computed: {},
+  computed: {
+    // 分类id，返回最后一项
+    cateId() {
+      if (this.selectedKeys.length === 3) {
+        return this.selectedKeys[2];
+      }
+    },
+  },
 
   mounted() {},
 
-  methods: {},
+  methods: {
+    // 运用于级联选择框，提供数据
+    async getcateLists() {
+      const { data: res } = await this.$http.get(`categories`);
+      // console.log(res);
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取选择列表失败");
+      }
+      this.parentsLists = res.data;
+    },
+    // 级联选项发生改变时触发
+    handleChange() {
+      if (this.selectedKeys.length !== 3) {
+        this.selectedKeys = [];
+      } else {
+        this.addGoodsruleForm.goods_cat = this.selectedKeys.join(",");
+      }
+    },
+
+    beforeChangeTabs(activeName, oldActiveName) {
+      // beforeChangeTabs和beforeChangeTabs()传的形参值不一样，前者以内置的值进行传递，后者传递的为undefined
+      // 若函数的返回值为false，则不切换tab，为true则切换
+      // console.log(`即将离开的标签页的名字是：${oldActiveName}`,`即将去往的标签页的名字是：${activeName}`);
+      // 返回的值为el-tab-pane中绑定的name值
+      // oldActiveName==0 这个条件为什么要满足？
+      if (oldActiveName == 0 && this.selectedKeys.length !== 3) {
+        this.$message.error("请选择三级商品分类");
+        return false;
+      }
+    },
+    // 点击tab栏的时候触发,即使不切换，点击了都会触发，所以，如何判断切换到了该tab栏？
+    async tabClicked() {
+      // 如何判断切换到了该tab栏？
+      if (this.activeindex == 1) {
+        // 请求发送动态参数列表,这里的id为最后一项
+        const { data: res } = await this.$http.get(
+          `categories/${this.cateId}/attributes`,
+          {
+            params: { sel: "many" },
+          }
+        );
+        console.log(res);
+        if (res.meta.status !== 200) {
+          return this.$message.error("获取动态参数列表失败！");
+        }
+        this.manyCatesData = res.data;
+        console.log(this.manyCatesData);
+      }
+    },
+  },
 };
 </script>
 <style scoped>
