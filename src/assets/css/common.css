@@ -38,3 +38,6 @@ body,
 .el-step__title{
   font-size: 14px;
 }
+.el-checkbox{
+  margin: 0 10px 0  0 !important;
+}

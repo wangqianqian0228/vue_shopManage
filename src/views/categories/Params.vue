@@ -338,7 +338,7 @@ export default {
       // 做一下判断，如果item.attr_vals为空的话就返回一个空数组
       // 遍历res.data中的每一项
       res.data.forEach((item) => {
-        item.attr_vals = item.attr_vals ? item.attr_vals.split(" ") : [];
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(",") : [];
         // 给每一项添加inputVisible和inputValue属性
         item.inputVisible = false;
         item.inputValue = "";

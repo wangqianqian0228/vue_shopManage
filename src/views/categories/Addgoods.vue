@@ -66,13 +66,67 @@
               </el-cascader>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
-          <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
-          <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
+          <el-tab-pane label="商品参数" name="1">
+            <!-- 复选框是放在form里面的，所以要创建form-item -->
+            <el-form-item
+              v-for="item in manyCatesData"
+              :key="item.attr_id"
+              :label="item.attr_name"
+            >
+              <!-- 复选框 -->
+              <el-checkbox-group v-model="item.attr_vals">
+                <el-checkbox
+                  :label="choose"
+                  v-for="(choose, index) in item.attr_vals"
+                  :key="index"
+                  @change="consoleArr"
+                  border
+                ></el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="商品属性" name="2">
+            <!-- 遍历渲染表单item -->
+            <el-form-item
+              v-for="item in onlyCatesData"
+              :key="item.attr_id"
+              :label="item.attr_name"
+            >
+              <el-input v-model="item.attr_vals"></el-input>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="商品图片" name="3">
+            <!-- 上传图片功能 -->
+            <!-- action:表示图片要上传至后台API的地址, -->
+            <!-- list-type：上传的图片的展示类型 -->
+            <!-- 注意：el-upload组件没有调用axios请求，故就没有token，需要手动添加headers设置上传的请求头部，属性值为一个对象 -->
+            <!-- 上传成功表示服务器已经存储了这张图片，接下来把图片在服务器上的路径放到请求体中。on-success文件上传成功时的钩子 -->
+            <el-upload
+              :action="uploadUrl"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              list-type="picture"
+              :headers="headerObj"
+              :on-success="handleSuccess"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
+
+    <!-- 预览对话框 -->
+    <el-dialog
+      title="图片预览"
+      center=""
+      :visible.sync="previewVisible"
+      width="50%"
+      >
+      <img :src="previewUrl" alt="" class="preview-pic">
+      
+    </el-dialog>
   </div>
 </template>
 
@@ -90,7 +144,7 @@ export default {
         goods_weight: 0,
         goods_number: 0,
         goods_introduce: "",
-        pics: {},
+        pics: [],
         attrs: [],
       },
       addGoodsRules: {
@@ -123,7 +177,17 @@ export default {
         //  父子节点取消选中关联，从而达到选择任意一级选项的目的
         checkStrictl: true,
       },
+      // 动态列表数据
       manyCatesData: [],
+      // 静态列表数据
+      onlyCatesData: [],
+      // 图片上传至后台地址，放在upload/文件夹下
+      uploadUrl: `http://127.0.0.1:8888/api/private/v1/upload/`,
+      headerObj: {
+        Authorization: window.sessionStorage.getItem("token"),
+      },
+      previewVisible:false,
+      previewUrl:''
     };
   },
   created() {
@@ -160,7 +224,7 @@ export default {
         this.addGoodsruleForm.goods_cat = this.selectedKeys.join(",");
       }
     },
-
+    //  切换表单之前要干的事
     beforeChangeTabs(activeName, oldActiveName) {
       // beforeChangeTabs和beforeChangeTabs()传的形参值不一样，前者以内置的值进行传递，后者传递的为undefined
       // 若函数的返回值为false，则不切换tab，为true则切换
@@ -176,20 +240,82 @@ export default {
     async tabClicked() {
       // 如何判断切换到了该tab栏？
       if (this.activeindex == 1) {
-        // 请求发送动态参数列表,这里的id为最后一项
-        const { data: res } = await this.$http.get(
-          `categories/${this.cateId}/attributes`,
-          {
-            params: { sel: "many" },
-          }
-        );
-        console.log(res);
-        if (res.meta.status !== 200) {
-          return this.$message.error("获取动态参数列表失败！");
-        }
-        this.manyCatesData = res.data;
-        console.log(this.manyCatesData);
+        this.getmanyParamsList();
+      } else if (this.activeindex == 2) {
+        this.getonlyParamsList();
       }
+    },
+    // 复选框发生改变时触发的函数
+    consoleArr() {
+      // console.log(this.manyCatesData);
+    },
+    // 获取动态参数列表
+    async getmanyParamsList() {
+      // 请求发送动态参数列表,这里的id为最后一项
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes`,
+        {
+          params: { sel: "many" },
+        }
+      );
+      console.log(res);
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取动态参数列表失败！");
+      }
+      res.data.forEach((item) => {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(",") : [];
+      });
+      this.manyCatesData = res.data;
+    },
+    // 获取静态参数列表
+    async getonlyParamsList() {
+      // 请求发送动态参数列表,这里的id为最后一项
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes`,
+        {
+          params: { sel: "only" },
+        }
+      );
+      console.log(res);
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取静态参数列表失败！");
+      }
+      this.onlyCatesData = res.data;
+      console.log(this.onlyCatesData);
+    },
+    // 处理图片预览效果
+    handlePreview(file) {
+      // 对话框显示
+      this.previewVisible = true;
+      this.previewUrl = file.response.data.url;
+      console.log(file);
+    },
+    // 移除图片的操作,file接收移除图片的信息
+    handleRemove(file) {
+      // 1. 获取将要删除的图片的临时路径
+      // 2. 在pics数组中，找到这个图片对应的索引
+      // 3. 运用splice()方法，删除该数组元素。
+      // console.log(file);
+      const filePath = file.response.data.tmp_path;
+      // console.log(filePath);
+      // console.log(this.addGoodsruleForm.pics[0].pic);
+     
+      const picIndex = this.addGoodsruleForm.pics.findIndex((item) => 
+       item.pic == filePath);
+      //  单行箭头函数不用写return和大括号
+      this.addGoodsruleForm.pics.splice(picIndex,1);
+    },
+    // 上传成功时的钩子函数,response表示上传成功后台返回的数据
+    handleSuccess(response) {
+      // console.log(response);
+      // {data: {…}, meta: {…}}
+      // data: {tmp_path: "tmp_uploads\b312651e5661da828fedc430c63256a1.jpg", url: "http://127.0.0.1:8888/tmp_uploads\b312651e5661da828fedc430c63256a1.jpg"}
+      // meta: {msg: "上传成功", status: 200}
+      // 1. 每上传一次就创建一个变量来存储后台路径
+      // 2. 把该数据追加到pics这个数组中去，成功一次追加一次
+      const picinfo = { pic: response.data.tmp_path };
+      this.addGoodsruleForm.pics.push(picinfo);
+      console.log(this.addGoodsruleForm);
     },
   },
 };
@@ -197,5 +323,8 @@ export default {
 <style scoped>
 .el-steps {
   margin: 15px 0;
+}
+.preview-pic{
+  width: 100%;
 }
 </style>
