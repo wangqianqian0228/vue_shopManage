@@ -7,6 +7,11 @@ import './assets/css/common.css'
 import axios from 'axios'
 import moment from 'moment'
 import TreeTable from 'vue-table-with-tree-grid'
+// 引入富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+import 'quill/dist/quill.core.css' // import styles
+import 'quill/dist/quill.snow.css' // for snow theme
+import 'quill/dist/quill.bubble.css' // for bubble theme
 
 
 
@@ -33,6 +38,7 @@ Vue.filter("dateString", function (value, format) {
   return moment.unix(parseInt(value)).format(format || "YYYY-MM-DD");
   // 自己传的参数format有的话，自定义的格式优先，没有的话，就是函数里面的格式优先
 });
+Vue.use(VueQuillEditor, /* { default global options } */)
 // 注册组件
 Vue.component('tree-table', TreeTable)
 new Vue({

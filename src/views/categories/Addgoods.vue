@@ -112,7 +112,13 @@
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
           </el-tab-pane>
-          <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
+          <el-tab-pane label="商品内容" name="4">
+            <quill-editor v-model="addGoodsruleForm.goods_introduce">
+            </quill-editor>
+            <el-button type="primary" class="addgoods" @click="addGoodsSubmit"
+              >添加商品</el-button
+            >
+          </el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
@@ -123,14 +129,15 @@
       center=""
       :visible.sync="previewVisible"
       width="50%"
-      >
-      <img :src="previewUrl" alt="" class="preview-pic">
-      
+    >
+      <img :src="previewUrl" alt="" class="preview-pic" />
     </el-dialog>
   </div>
 </template>
 
 <script>
+import _ from "lodash";
+// lodash一般采用 _来接收
 export default {
   data() {
     return {
@@ -186,8 +193,8 @@ export default {
       headerObj: {
         Authorization: window.sessionStorage.getItem("token"),
       },
-      previewVisible:false,
-      previewUrl:''
+      previewVisible: false,
+      previewUrl: "",
     };
   },
   created() {
@@ -276,19 +283,19 @@ export default {
           params: { sel: "only" },
         }
       );
-      console.log(res);
+      // console.log(res);
       if (res.meta.status !== 200) {
         return this.$message.error("获取静态参数列表失败！");
       }
       this.onlyCatesData = res.data;
-      console.log(this.onlyCatesData);
+      // console.log(this.onlyCatesData);
     },
     // 处理图片预览效果
     handlePreview(file) {
       // 对话框显示
       this.previewVisible = true;
       this.previewUrl = file.response.data.url;
-      console.log(file);
+      // console.log(file);
     },
     // 移除图片的操作,file接收移除图片的信息
     handleRemove(file) {
@@ -299,11 +306,12 @@ export default {
       const filePath = file.response.data.tmp_path;
       // console.log(filePath);
       // console.log(this.addGoodsruleForm.pics[0].pic);
-     
-      const picIndex = this.addGoodsruleForm.pics.findIndex((item) => 
-       item.pic == filePath);
+
+      const picIndex = this.addGoodsruleForm.pics.findIndex(
+        (item) => item.pic == filePath
+      );
       //  单行箭头函数不用写return和大括号
-      this.addGoodsruleForm.pics.splice(picIndex,1);
+      this.addGoodsruleForm.pics.splice(picIndex, 1);
     },
     // 上传成功时的钩子函数,response表示上传成功后台返回的数据
     handleSuccess(response) {
@@ -315,7 +323,52 @@ export default {
       // 2. 把该数据追加到pics这个数组中去，成功一次追加一次
       const picinfo = { pic: response.data.tmp_path };
       this.addGoodsruleForm.pics.push(picinfo);
-      console.log(this.addGoodsruleForm);
+      // console.log(this.addGoodsruleForm);
+    },
+    // 添加商品
+    addGoodsSubmit() {
+      // 验证数据的有效性
+      this.$refs.addGoodsRules.validate(async(value) => {
+        if (!value) {
+          return this.$message.error("请填写必填项");
+        }
+        // 因为传的数据中，goods_cat是要转换为字符串的,此时级联框不愿意了，人家要的是数组。所以可以将this.addGoodsruleForm进行深拷贝，将这个拷贝的goods_cat转换为字符串。
+        // this.addGoodsruleForm.goods_cat=this.addGoodsruleForm.goods_cat.join(',');
+        // 采用lodash对象来用它的方法cloneDeep，深度拷贝
+        // const cloneAddForm = _.cloneDeep(this.addGoodsruleForm);
+        // console.log(this.addGoodsruleForm);
+        // // console.log(cloneAddForm);
+        // cloneAddForm.goods_cat = cloneAddForm.goods_cat.join(",");
+        // console.log(cloneAddForm);
+
+        // 对this.addGoodsruleForm.attrs[]进行添加数据，其数据为动态参数和静态参数具体的相关项
+        // console.log(this.manyCatesData);
+        // console.log(this.onlyCatesData);
+        // 将manyCatesData中的数据追加到attrs[]数组中。
+        this.manyCatesData.forEach((item) => {
+          const manyObj={};
+          manyObj.attr_id = item.attr_id;
+          manyObj.attr_value = item.attr_vals.join(' ');
+          this.addGoodsruleForm.attrs.push(manyObj);
+        });
+        // console.log(manyobj);
+        // console.log(this.addGoodsruleForm.attrs);
+        this.onlyCatesData.forEach((item) => {
+          const onlyObj={};
+          onlyObj.attr_id = item.attr_id;
+          onlyObj.attr_value = item.attr_vals;
+          this.addGoodsruleForm.attrs.push(onlyObj);
+        });
+        // console.log(manyobj);
+        // console.log(this.addGoodsruleForm.attrs);
+        // 发送添加商品请求
+      const{data:res}= await this.$http.post('goods',this.addGoodsruleForm);
+      if(res.meta.status!==201){
+          return this.$message.error(res.meta.msg);
+      }
+      this.$message.success('创建商品成功');
+      this.$router.push('/home/goods');
+      });
     },
   },
 };
@@ -324,7 +377,10 @@ export default {
 .el-steps {
   margin: 15px 0;
 }
-.preview-pic{
+.preview-pic {
   width: 100%;
+}
+.addgoods {
+  margin: 15px 0;
 }
 </style>
