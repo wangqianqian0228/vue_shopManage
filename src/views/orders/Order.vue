@@ -130,6 +130,7 @@
         label-width="100px"
       >
         <el-form-item label="省市区/县" prop="address1">
+        <!-- cityData包名需要在元素内引用，所以需要在data中进行定义 -->
           <el-cascader :options="cityData" v-model="editOrderForm.address1">
           </el-cascader>
         </el-form-item>
