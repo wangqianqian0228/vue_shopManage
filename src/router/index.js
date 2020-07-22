@@ -1,23 +1,38 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/Login.vue'
-import Home from '../views/Home.vue'
-import Welcome from '../views/Welcome.vue'
-import User from '../views/users/Users.vue'
-import Rights from '../views/rights/Rights.vue'
-import Roles from '../views/rights/Roles.vue'
-import Categories from '../views/categories/Categories.vue'
-import Params from '../views/categories/Params.vue'
-import Goods from '../views/categories/Goods.vue'
-import Addgoods from '../views/categories/Addgoods.vue'
-import Order from '../views/orders/Order.vue'
-import Report from '../views/report/Report.vue'
+// 按需加载路由
+const Login = () => import(/* webpackChunkName: "Login_Home_Welcome" */ '../views/Login.vue')
+// import Login from '../views/Login.vue'
+// import Home from '../views/Home.vue'
+const Home = () => import(/* webpackChunkName: "Login_Home_Welcome" */ '../views/Home.vue')
+const Welcome = () => import(/* webpackChunkName: "Login_Home_Welcome" */ '../views/Welcome.vue')
+// import Welcome from '../views/Welcome.vue'
+// import User from '../views/users/Users.vue'
+const User = () => import(/* webpackChunkName: "User" */ '../views/users/Users.vue')
+const Rights = () => import(/* webpackChunkName: "Rights_Roles" */ '../views/rights/Rights.vue')
+const Roles = () => import(/* webpackChunkName: "Rights_Roles" */ '../views/rights/Roles.vue')
+const Categories = () => import(/* webpackChunkName: "Categories-Params-Goods-Addgoods" */ '../views/categories/Categories.vue')
+const Params = () => import(/* webpackChunkName: "Categories_Params_Goods_Addgoods" */ '../views/categories/Params.vue')
+const Goods = () => import(/* webpackChunkName: "Categories_Params_Goods_Addgoods" */ '../views/categories/Goods.vue')
+const Addgoods = () => import(/* webpackChunkName: "Categories_Params_Goods_Addgoods" */ '../views/categories/Addgoods.vue')
+const Order = () => import(/* webpackChunkName: "Order" */ '../views/orders/Order.vue')
+const Report = () => import(/* webpackChunkName: "Order" */ '../views/report/Report.vue')
+
+// import Rights from '../views/rights/Rights.vue'
+// import Roles from '../views/rights/Roles.vue'
+// import Categories from '../views/categories/Categories.vue'
+// import Params from '../views/categories/Params.vue'
+
+// import Goods from '../views/categories/Goods.vue'
+// import Addgoods from '../views/categories/Addgoods.vue'
+// import Order from '../views/orders/Order.vue'
+// import Report from '../views/report/Report.vue'
 
 Vue.use(VueRouter)
-const originalPush = VueRouter.prototype.push
-   VueRouter.prototype.push = function push(location) {
-   return originalPush.call(this, location).catch(err => err)
-}
+// const originalPush = VueRouter.prototype.push
+//    VueRouter.prototype.push = function push(location) {
+//    return originalPush.call(this, location).catch(err => err)
+// }
 const router = new VueRouter({
   routes: [{
       path: '/login',

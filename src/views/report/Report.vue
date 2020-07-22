@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import echarts from "echarts";
-import _ from 'lodash'
+// import echarts from "echarts";
+// import _ from 'lodash'
 
 export default {
   data() {
@@ -57,12 +57,14 @@ export default {
 
   // 元素的DOM元素已经渲染完毕
   mounted() {
-    this.drline();
+    this.$nextTick(() => {
+      this.drline();
+    })
   },
 
   methods: {
     async drline() {
-      var myChart = echarts.init(document.getElementById("total"));
+      var myChart = this.$echarts.init(document.getElementById("total"));
       // 向后台发送请求
       const { data: res } = await this.$http.get("reports/type/1");
       if(res.meta.status!==200){
@@ -70,7 +72,7 @@ export default {
       }
       // 将要合并的数据用lodash中的方法与后台返回的数据进行合并。
     //  console.log(res.data);
-     res.data= _.merge(res.data,this.options);
+     res.data= this.$_.merge(res.data,this.options);
     //  console.log(res.data);
       myChart.setOption(res.data);
     },

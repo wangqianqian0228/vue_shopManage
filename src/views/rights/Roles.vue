@@ -29,7 +29,7 @@
             <!-- el-row：行 el-col：列，有几行是由scope.row.children来看的，有几个就渲染几行-->
             <el-row
               :gutter="10"
-              v-for="(item1, index1) in scope.row.children"
+              v-for="(item1, index1) in scope.row.childrens"
               :key="item1.id"
               :class="['bdbottom', 'vcenter', index1 == 0 ? 'bdtop' : '']"
             >
@@ -44,7 +44,7 @@
               <el-col :span="20">
                 <el-row
                   :gutter="10"
-                  v-for="(item2, index2) in item1.children"
+                  v-for="(item2, index2) in item1.childrens"
                   :key="item2.id"
                   :class="[index2 == 0 ? '' : 'bdtop', 'vcenter']"
                 >
@@ -64,7 +64,7 @@
                     <el-tag
                       closable
                       type="danger"
-                      v-for="item3 in item2.children"
+                      v-for="item3 in item2.childrens"
                       :key="item3.id"
                       class="tagdanger vleft"
                       @close="removeThirdTag(scope.row, item3.id)"
@@ -225,7 +225,7 @@ export default {
       // 树形控件的属性绑定对象
       defaultProps: {
         // 父子节点通过哪个属性来进行嵌套的
-        children: "children",
+        childrens: "childrens",
         // label：看到的是哪个属性的值
         label: "authName",
       },
@@ -241,14 +241,30 @@ export default {
   mounted() {},
 
   methods: {
+    handleChild (arr) {
+      if (arr instanceof Array && arr.length) {
+        arr.forEach(item => {
+            if (item.children) {
+              item.childrens = item.children
+              delete item.children
+              this.handleChild(item.childrens)
+            }
+            
+        })
+       return arr
+      } else {
+        return
+      }
+    },
     async getRolesLists() {
       const { data: res } = await this.$http.get("roles");
       if (res.meta.status !== 200) {
         this.$message.error(res.meta.msg);
         return;
       }
-      this.rolesLists = res.data;
-      // console.log(this.rolesLists);
+      this.rolesLists = this.handleChild(res.data);
+
+      console.log(this.rolesLists);
     },
     // 添加用户的对话框关闭，就要清空表单数据
     resetRolesForm() {
