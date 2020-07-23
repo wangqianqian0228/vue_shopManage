@@ -241,6 +241,7 @@ export default {
   mounted() {},
 
   methods: {
+    // 修改字段名称
     handleChild (arr) {
       if (arr instanceof Array && arr.length) {
         arr.forEach(item => {
@@ -378,7 +379,7 @@ export default {
       this.rightsLists = res.data;
       // console.log(this.rightsLists);
       // const{data:result}= await this.$http.get(`rights/list`)
-      // 列表形是直接显示出所有的数据
+      // 列表型是直接显示出所有的数据
       this.getRightsId(role, this.defkeys);
       // console.log(this.defkeys);
       this.setRightsDialog = true;
@@ -387,10 +388,10 @@ export default {
     // 获取三级权限的id，然后把对应的id追加到数组中，要根据递归的方法
     getRightsId(node, arr) {
       // 该项没有孩子的话，就把对应的id追加给数组，则每一个数组元素都要执行该函数，所以需要用到数组的forEach()方法
-      if (!node.children) {
+      if (!node.childrens) {
         return arr.push(node.id);
       }
-      node.children.forEach((item) => {
+      node.childrens.forEach((item) => {
         this.getRightsId(item, arr);
       });
       //  孩子们都执行这个函数，所以里面的参数，为item

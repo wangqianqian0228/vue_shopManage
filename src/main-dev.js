@@ -19,10 +19,6 @@ import _ from 'lodash'
 import Nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
 
-
-
-
-
 // 配置请求的根路径
 axios.defaults.baseURL = `http://127.0.0.1:8888/api/private/v1/`
 // 挂载到vue上，vue所有的组件就可以用$http这个方法

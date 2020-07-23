@@ -117,6 +117,7 @@ export default {
           //   1.2 项目中除了登陆接口以外，其余的API接口，必须在登陆之后才能访问。
           // 2. 通过编程式导航，跳转到后台主页，路由地址是/home
           // console.log(res.data.token);
+          // 登录成功会返回一个res.data.token数据，将其存储起来
           window.sessionStorage.setItem('token',res.data.token);
           this.$router.push('/home');
         } else {

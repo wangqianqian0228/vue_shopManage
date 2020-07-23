@@ -6,7 +6,7 @@ module.exports={
         config.when(process.env.NODE_ENV === 'production',config=>{
             config.entry('app').clear().add('./src/main-prod.js');
 
-            //使用externals设置排除项
+            // 使用externals设置排除项
             config.set('externals',{
                 vue:'Vue',
                 'vue-router':'VueRouter',
@@ -14,7 +14,7 @@ module.exports={
                 lodash:'_',
                 moment:'moment',
                 echarts:'echarts',
-                nprogress:'Nprogress',
+                Nprogress:'NProgress',
                 'vue-quill-editor':'VueQuillEditor'
             })
             config.plugin('html').tap(args=>{
