@@ -368,7 +368,7 @@ export default {
       // 不用重新执行this.getRolesLists();会刷新table列表，导致页面的完整渲染，降低用户体验
       // 返回的data, 是当前角色下最新的权限数据
       // 重新赋值一遍就可以了
-      roles.children = res.data;
+      roles.childrens = res.data;
     },
     // 分配权限的对话框的显示
     async setRightsDialogVisible(role) {

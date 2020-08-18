@@ -54,8 +54,6 @@ Vue.prototype.$http = axios;
 // 3. 创建一个函数用来绘制图表，并放在vue的mouted函数下去执行。因为mouted函数是DOM元素已经初始化完毕了
 // 4. myChart.setOption(option)，其中的option表示是配置项和数据
 
-
-
 // 时间过滤器
 Vue.filter("dateString", function (value, format) {
   return moment.unix(parseInt(value)).format(format || "YYYY-MM-DD");

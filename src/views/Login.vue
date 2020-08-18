@@ -46,11 +46,6 @@
 </template>
 
 <script>
-// import {
-//     Message
-
-// } from 'element-ui'
-
 export default {
   data() {
     return {
@@ -61,10 +56,12 @@ export default {
       },
       // 表单的验证规则对象
       Loginrules: {
+        // 验证用户名规则
         username: [
           { required: true, message: "请输入正确的用户名", trigger: "blur" },
           { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
         ],
+        // 验证密码规则
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
           {
@@ -98,8 +95,14 @@ export default {
         // console.log(value)
         if (!value) return;
         // 在main.js中安装axios包
+        // const res = this.$http.post('login',this.loginForm)
         const { data: res } = await this.$http.post("login", this.loginForm);
+        // console.log(this.$http.post("login", this.loginForm).then(function(value){
+        //   console.log(value.data)
+        //   // value.data得到真是的数据
+        // }))
         // console.log(res);
+        // console.log(await this.$http.post("login", this.loginForm))
         const { meta: meta } = res;
         // console.log(meta);
         const mes = meta.msg;
@@ -108,17 +111,19 @@ export default {
           //   message: '恭喜你，这是一条成功消息',
           // type: 'success'
           // })
-          this.$message({
-            message: mes,
-            type: "success",
-          });
+          // this.$message({
+          //   message: mes,
+          //   type: "success",
+          // });
+          this._remind(mes)
           // 1. 将登陆之后产生的token，存放在客户端的sessionStorage里面，
           //   1.1 因为token是在当前网站打开期间有效，
           //   1.2 项目中除了登陆接口以外，其余的API接口，必须在登陆之后才能访问。
           // 2. 通过编程式导航，跳转到后台主页，路由地址是/home
-          // console.log(res.data.token);
+          // console.log(res.data);
           // 登录成功会返回一个res.data.token数据，将其存储起来
           window.sessionStorage.setItem('token',res.data.token);
+          // window.sessionStorage.setItem('token',res.data.token)
           this.$router.push('/home');
         } else {
           this.$message({

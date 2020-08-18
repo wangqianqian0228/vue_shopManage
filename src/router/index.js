@@ -92,7 +92,7 @@ const router = new VueRouter({
 })
 // 挂载路由守航
 router.beforeEach((to, from, next) => {
-  // console.log(to.path)
+  // console.log(to)
   // to表示将要去往的路径，用to.path()来查看将要访问的路径
   if (to.path == '/login') {
     return next()

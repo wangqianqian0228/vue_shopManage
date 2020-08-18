@@ -1,47 +1,47 @@
 import Vue from 'vue'
 // 导入element-ui各组件
-import { 
-    Button, 
-    FormItem,
-    Form,
-    Input,
-    Message,
-    Container,
-    Header,
-    Aside,
-    Main,
-    Footer,
-    Menu,
-    Submenu,
-    MenuItem,
-    Breadcrumb,
-    BreadcrumbItem,
-    Card,
-    Row,
-    Col,
-    Table,
-    TableColumn,
-    Switch,
-    Pagination,
-    Dialog,
-    MessageBox,
-    Tag,
-    Tree,
-    Select,
-    Option,
-    Loading,
-    Cascader,
-    Alert,
-    Tabs,
-    TabPane,
-    Steps,
-    Step,
-    CheckboxGroup,
-    Checkbox,
-    Upload,
-    Tooltip,
-    Timeline,
-    TimelineItem
+import {
+  Button,
+  FormItem,
+  Form,
+  Input,
+  Message,
+  Container,
+  Header,
+  Aside,
+  Main,
+  Footer,
+  Menu,
+  Submenu,
+  MenuItem,
+  Breadcrumb,
+  BreadcrumbItem,
+  Card,
+  Row,
+  Col,
+  Table,
+  TableColumn,
+  Switch,
+  Pagination,
+  Dialog,
+  MessageBox,
+  Tag,
+  Tree,
+  Select,
+  Option,
+  Loading,
+  Cascader,
+  Alert,
+  Tabs,
+  TabPane,
+  Steps,
+  Step,
+  CheckboxGroup,
+  Checkbox,
+  Upload,
+  Tooltip,
+  Timeline,
+  TimelineItem
 
 } from 'element-ui'
 
@@ -90,10 +90,10 @@ Vue.use(TimelineItem)
 
 
 Message.install = function (Vue, options) {
-    Vue.prototype.$message = Message
-    // vue其他的实例就可以引用这个$message方法
-  }
-  Vue.use(Message )//消息提示
+  Vue.prototype.$message = Message
+  // vue其他的实例就可以引用这个$message方法
+}
+Vue.use(Message) //消息提示
 //  引入组件的时候自动调用Vue.use()方法，Message对象又会自动调用install这个方法
 // 把这个Message对象放在vue的原型的上。
 
@@ -101,3 +101,9 @@ Message.install = function (Vue, options) {
 Vue.prototype.$message = Message;
 Vue.prototype.$confirm = MessageBox.confirm
 // MessageBox有confirm,prompt方法，可以直接挂载在Vue.prototype上，以后要用MessageBox上的方法，可以直接使用this.$confirm
+Vue.prototype._remind = function (message, type = 'success') {
+  Message({
+    message,
+    type,
+  })
+};
