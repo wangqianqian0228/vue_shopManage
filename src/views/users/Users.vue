@@ -317,7 +317,7 @@ export default {
       //   总共有多少条数据
       this.total = res.data.total;
     },
-    // 监听页面每页显示多少条的改变的函数
+    // 监听页面每页显示多少条的改变的函数,一改变就会得到你选中的这个值
     handleSizeChange(val) {
       //   console.log(`每页 ${val} 条`);
       // 每页显示多少条数据

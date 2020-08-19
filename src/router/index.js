@@ -44,44 +44,45 @@ const router = new VueRouter({
     {
       path: '/home',
       redirect: '/welcome',
+      // 路由重定向
       component: Home,
       children: [{
         path: '/welcome',
         component: Welcome
       }, {
-        path: '/home/users',
+        path: '/users',
         component: User
       },
       {
-        path: '/home/rights',
+        path: '/rights',
         component: Rights
       },
       {
-        path: '/home/roles',
+        path: '/roles',
         component: Roles
       },
       {
-        path: '/home/goods',
+        path: '/goods',
         component: Goods
       },
       {
-        path: '/home/params',
+        path: '/params',
         component: Params
       },
       {
-        path: '/home/categories',
+        path: '/categories',
         component: Categories
       },
       {
-        path: '/home/addgoods',
+        path: '/addgoods',
         component: Addgoods
       },
       {
-        path: '/home/orders',
+        path: '/orders',
         component: Order
       },
       {
-        path: '/home/reports',
+        path: '/reports',
         component: Report
       }
 
