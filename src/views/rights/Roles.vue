@@ -265,7 +265,7 @@ export default {
       }
       this.rolesLists = this.handleChild(res.data);
 
-      console.log(this.rolesLists);
+      // console.log(this.rolesLists);
     },
     // 添加用户的对话框关闭，就要清空表单数据
     resetRolesForm() {
@@ -364,11 +364,12 @@ export default {
         this.$message.error(res.meta.msg);
         return;
       }
-      this.$message.success(res.meta.msg);
+      this.$message.success('删除成功');
       // 不用重新执行this.getRolesLists();会刷新table列表，导致页面的完整渲染，降低用户体验
       // 返回的data, 是当前角色下最新的权限数据
       // 重新赋值一遍就可以了
-      roles.childrens = res.data;
+      // console.log(res.data)
+      roles.childrens = this.handleChild(res.data)
     },
     // 分配权限的对话框的显示
     async setRightsDialogVisible(role) {
